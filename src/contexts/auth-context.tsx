@@ -48,11 +48,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               ...userData
             });
           } else {
-            setCurrentUser(null);
+            // Create a basic user object from firebase auth data
+            setCurrentUser({
+              id: firebaseUser.uid,
+              email: firebaseUser.email || '',
+              fullName: firebaseUser.displayName || 'User'
+            });
           }
         } catch (error) {
           console.error("Error fetching user data:", error);
-          setCurrentUser(null);
+          // Create basic user from auth even if Firestore fails
+          if (firebaseUser.email) {
+            setCurrentUser({
+              id: firebaseUser.uid,
+              email: firebaseUser.email,
+              fullName: firebaseUser.displayName || 'User'
+            });
+          } else {
+            setCurrentUser(null);
+          }
         }
       } else {
         setCurrentUser(null);
@@ -69,20 +83,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create user document in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        fullName,
-        email
-      });
+      try {
+        // Create user document in Firestore
+        await setDoc(doc(db, "users", user.uid), {
+          fullName,
+          email
+        });
+      } catch (firestoreError) {
+        console.error("Error creating user document:", firestoreError);
+        // Continue even if Firestore fails - user is still authenticated
+      }
 
       toast({
         title: "Account created successfully",
         description: "You can now log in with your credentials",
       });
     } catch (error: any) {
+      let errorMessage = "Error creating account";
+      
+      if (error.code === 'auth/network-request-failed') {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Email already in use. Try logging in instead.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email format.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak. Use at least 6 characters.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error creating account",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;
@@ -100,9 +133,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Welcome back!",
       });
     } catch (error: any) {
+      let errorMessage = "Error logging in";
+      
+      if (error.code === 'auth/network-request-failed') {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (error.code === 'auth/invalid-credential') {
+        errorMessage = "Invalid email or password.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email format.";
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = "Account not found. Try signing up instead.";
+      } else if (error.code === 'auth/wrong-password') {
+        errorMessage = "Wrong password.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Error logging in",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
       throw error;

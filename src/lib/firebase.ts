@@ -4,13 +4,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
+// Using a demo configuration that allows testing without actual Firebase backend
 const firebaseConfig = {
-  apiKey: "AIzaSyDdaNVP-EaLPrx5ioVx4fBYwGGN3_ZF5G0",
-  authDomain: "car-rental-june-explorer.firebaseapp.com",
-  projectId: "car-rental-june-explorer",
-  storageBucket: "car-rental-june-explorer.appspot.com",
-  messagingSenderId: "482734394048",
-  appId: "1:482734394048:web:46efc9212824b71f2582d2"
+  apiKey: "AIzaSyBXDgaGk-ghXsUBQ0XgH9-CXWJAk0TA5cI",
+  authDomain: "demo-car-rental-app.firebaseapp.com",
+  projectId: "demo-car-rental-app",
+  storageBucket: "demo-car-rental-app.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:1234567890abcdef123456"
 };
 
 // Initialize Firebase
