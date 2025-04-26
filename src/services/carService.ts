@@ -135,17 +135,21 @@ export const getUserRentals = async (userId: string): Promise<Rental[]> => {
     const rentals: Rental[] = [];
     
     for (const rentalDoc of rentalsSnapshot.docs) {
-      const rentalData = rentalDoc.data() as Omit<Rental, 'id'>;
+      const rentalData = rentalDoc.data();
       const rental: Rental = {
         ...rentalData,
         id: rentalDoc.id,
         // Convert Firebase timestamps to JavaScript Dates
         rentDate: rentalData.rentDate instanceof Date 
           ? rentalData.rentDate 
-          : new Date(rentalData.rentDate.seconds * 1000),
+          : rentalData.rentDate && typeof rentalData.rentDate.toDate === 'function'
+            ? rentalData.rentDate.toDate()
+            : new Date(),
         returnDate: rentalData.returnDate instanceof Date 
           ? rentalData.returnDate 
-          : new Date(rentalData.returnDate.seconds * 1000),
+          : rentalData.returnDate && typeof rentalData.returnDate.toDate === 'function'
+            ? rentalData.returnDate.toDate()
+            : new Date(),
       };
       
       // Get car details
