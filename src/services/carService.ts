@@ -1,4 +1,3 @@
-
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, getDoc, doc, setDoc, addDoc } from 'firebase/firestore';
 import { Car, Rental } from '../lib/types';
@@ -137,8 +136,10 @@ export const getUserRentals = async (userId: string): Promise<Rental[]> => {
     for (const rentalDoc of rentalsSnapshot.docs) {
       const rentalData = rentalDoc.data();
       const rental: Rental = {
-        ...rentalData,
         id: rentalDoc.id,
+        carId: rentalData.carId,
+        userId: rentalData.userId,
+        userName: rentalData.userName,
         // Convert Firebase timestamps to JavaScript Dates
         rentDate: rentalData.rentDate instanceof Date 
           ? rentalData.rentDate 
