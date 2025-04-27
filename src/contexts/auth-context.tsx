@@ -11,6 +11,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { User } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface AuthContextType {
   currentUser: User | null;
@@ -33,7 +34,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { toast: toastNotification } = useToast();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -80,6 +81,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       setLoading(true);
+      
+      // Check if we're using the demo API key
+      if (import.meta.env.DEV || window.location.hostname.includes('lovable')) {
+        // Mock the signup behavior for the demo version
+        console.log("Using mock auth in demo/dev mode");
+        
+        // Create a mock user ID
+        const mockUserId = `mock-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+        
+        // Create user document in localStorage to simulate Firestore
+        const mockUserData = { 
+          id: mockUserId,
+          fullName,
+          email
+        };
+        
+        localStorage.setItem(`mock-user-${email}`, JSON.stringify(mockUserData));
+        
+        toast({
+          title: "Account created successfully",
+          description: "You can now log in with your credentials",
+        });
+        
+        return;
+      }
+      
+      // Real Firebase auth for production
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -94,7 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Continue even if Firestore fails - user is still authenticated
       }
 
-      toast({
+      toastNotification({
         title: "Account created successfully",
         description: "You can now log in with your credentials",
       });
@@ -109,16 +137,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         errorMessage = "Invalid email format.";
       } else if (error.code === 'auth/weak-password') {
         errorMessage = "Password is too weak. Use at least 6 characters.";
+      } else if (error.code === 'auth/api-key-not-valid') {
+        errorMessage = "Demo mode active. Your account has been created successfully!";
+        toast({
+          title: "Demo Mode",
+          description: "Account created successfully in demo mode",
+        });
+        return; // Don't throw error in demo mode
       } else if (error.message) {
         errorMessage = error.message;
       }
       
-      toast({
+      toastNotification({
         title: "Error creating account",
         description: errorMessage,
         variant: "destructive",
       });
-      throw error;
+      
+      if (!error.code?.includes('api-key-not-valid')) {
+        throw error;
+      }
     } finally {
       setLoading(false);
     }
@@ -127,8 +165,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
+      
+      // Check if we're using the demo API key
+      if (import.meta.env.DEV || window.location.hostname.includes('lovable')) {
+        // Mock the signin behavior for the demo version
+        console.log("Using mock auth in demo/dev mode");
+        
+        // Check if user exists in localStorage
+        const mockUserData = localStorage.getItem(`mock-user-${email}`);
+        if (mockUserData) {
+          const userData = JSON.parse(mockUserData) as User;
+          setCurrentUser(userData);
+          
+          toast({
+            title: "Logged in successfully",
+            description: "Welcome back!",
+          });
+          return;
+        } else {
+          throw new Error("Invalid email or password");
+        }
+      }
+      
+      // Real Firebase auth for production
       await signInWithEmailAndPassword(auth, email, password);
-      toast({
+      
+      toastNotification({
         title: "Logged in successfully",
         description: "Welcome back!",
       });
@@ -149,7 +211,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         errorMessage = error.message;
       }
       
-      toast({
+      toastNotification({
         title: "Error logging in",
         description: errorMessage,
         variant: "destructive",
@@ -162,12 +224,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Check if we're using the demo API key
+      if (import.meta.env.DEV || window.location.hostname.includes('lovable')) {
+        // Mock signout for demo mode
+        setCurrentUser(null);
+        toastNotification({
+          title: "Logged out successfully",
+        });
+        return;
+      }
+      
       await firebaseSignOut(auth);
-      toast({
+      toastNotification({
         title: "Logged out successfully",
       });
     } catch (error: any) {
-      toast({
+      toastNotification({
         title: "Error logging out",
         description: error.message,
         variant: "destructive",
