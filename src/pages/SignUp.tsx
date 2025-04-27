@@ -14,14 +14,35 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   
   const navigate = useNavigate();
   const { signUp } = useAuth();
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    
+    if (!fullName.trim()) {
+      setError("Full name is required");
+      toast.error("Full name is required");
+      return;
+    }
+    
+    if (!email.trim()) {
+      setError("Email is required");
+      toast.error("Email is required");
+      return;
+    }
+    
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
     
     if (password !== confirmPassword) {
+      setError("Passwords do not match");
       toast.error("Passwords do not match");
       return;
     }
@@ -29,9 +50,11 @@ const SignUp = () => {
     try {
       setLoading(true);
       await signUp(email, password, fullName);
+      toast.success("Account created successfully");
       navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
+      setError(error?.message || "Failed to create account");
       // Toast is already handled in auth context
     } finally {
       setLoading(false);
@@ -52,6 +75,12 @@ const SignUp = () => {
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4 bg-white p-8 rounded-lg shadow-sm">
+          {error && (
+            <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          
           <div className="space-y-2">
             <Label htmlFor="fullName">Full Name</Label>
             <Input
@@ -81,7 +110,7 @@ const SignUp = () => {
             <Input
               id="password"
               type="password"
-              placeholder="Create a password"
+              placeholder="Create a password (min. 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -101,7 +130,11 @@ const SignUp = () => {
             />
           </div>
           
-          <Button type="submit" className="w-full bg-car hover:bg-car-secondary" disabled={loading}>
+          <Button 
+            type="submit" 
+            className="w-full bg-car hover:bg-car-secondary" 
+            disabled={loading}
+          >
             {loading ? "Creating account..." : "Create Account"}
           </Button>
           
