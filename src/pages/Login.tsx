@@ -31,56 +31,68 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-blue-50 px-4">
-      <div className="animate-fade-in w-full max-w-md">
-        <div className="mb-8 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-car-light rounded-full p-4">
-              <Car size={40} className="text-car" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
+      <div className="animate-fade-in w-full max-w-md space-y-8">
+        <div className="text-center space-y-6">
+          <div className="flex justify-center">
+            <div className="bg-blue-50 rounded-full p-4">
+              <Car className="w-10 h-10 text-blue-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Welcome back</h1>
-          <p className="text-gray-600 mt-2">Sign in to continue to Car Rentals</p>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Car Rental</h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Your Ultimate Car Rental Experience
+            </p>
+          </div>
         </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4 bg-white p-8 rounded-lg shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
-              placeholder="Enter your email"
+              placeholder="example@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              Password
+            </Label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
           
-          <Button type="submit" className="w-full bg-car hover:bg-car-secondary" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Let's Get Started"}
           </Button>
-          
-          <div className="text-center mt-6">
-            <p className="text-gray-600">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-car hover:underline font-medium">
-                Sign up
-              </Link>
-            </p>
-          </div>
         </form>
+        
+        <p className="text-center text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );
