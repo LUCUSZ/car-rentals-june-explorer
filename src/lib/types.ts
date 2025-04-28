@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   fullName: string;
@@ -11,6 +10,7 @@ export interface Car {
   model: string;
   color: string;
   rentals: CarRental[];
+  image?: string; // Optional image URL
 }
 
 export interface CarRental {

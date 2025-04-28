@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Car as CarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { getAvailableCars, isJune2025, populateMockData } from "@/services/carService";
+import { getAvailableCars, populateMockData } from "@/services/carService";
 import { Car } from "@/lib/types";
 import { toast } from "sonner";
 
@@ -48,12 +48,7 @@ const Home = () => {
   
   const handleSearch = async () => {
     if (!date) {
-      toast.error("Please select a date in June 2025");
-      return;
-    }
-    
-    if (!isJune2025(date)) {
-      toast.error("Please select a date in June 2025 only");
+      toast.error("Please select a date");
       return;
     }
     
@@ -84,18 +79,13 @@ const Home = () => {
     navigate(`/rental-confirmation/${carId}?date=${date.toISOString()}`);
   };
   
-  // Function to determine if a day is in June 2025
-  const isDateInJune2025 = (day: Date) => {
-    return !isJune2025(day);
-  };
-  
   return (
     <div className="animate-fade-in">
       <h1 className="text-3xl font-bold mb-6 text-center sm:text-left">Find Available Cars</h1>
       
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <h2 className="text-xl font-semibold mb-4">Search by Date</h2>
-        <p className="text-gray-600 mb-6">Select a date in June 2025 to see available cars.</p>
+        <p className="text-gray-600 mb-6">Select a date to see available cars.</p>
         
         <div className="flex flex-col sm:flex-row gap-4">
           <Popover>
@@ -108,7 +98,7 @@ const Home = () => {
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "MMMM d, yyyy") : <span>Select a date in June 2025</span>}
+                {date ? format(date, "MMMM d, yyyy") : <span>Select a date</span>}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -116,7 +106,6 @@ const Home = () => {
                 mode="single"
                 selected={date}
                 onSelect={setDate}
-                disabled={isDateInJune2025}
                 initialFocus
                 className={cn("p-3 pointer-events-auto")}
               />
@@ -151,14 +140,42 @@ const Home = () => {
           {availableCars.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availableCars.map((car) => (
-                <Card key={car.id} className="car-card">
-                  <CardHeader className={`bg-car-light text-car`}>
-                    <CardTitle>{car.make} {car.model}</CardTitle>
+                <Card key={car.id} className="car-card overflow-hidden">
+                  <div className="aspect-video bg-muted relative">
+                    <img
+                      src={car.image || "/placeholder.svg"}
+                      alt={`${car.make} ${car.model}`}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <CardHeader className="bg-car-light">
+                    <CardTitle className="text-car flex items-center gap-2">
+                      <CarIcon className="h-5 w-5" />
+                      {car.make} {car.model}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">Color</span>
-                      <span className="text-gray-700">{car.color}</span>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Car ID</span>
+                        <span className="text-gray-700">{car.id}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Make</span>
+                        <span className="text-gray-700">{car.make}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Model</span>
+                        <span className="text-gray-700">{car.model}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Color</span>
+                        <span className="text-gray-700">{car.color}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Status</span>
+                        <span className="text-green-600">Available</span>
+                      </div>
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-end border-t pt-4">

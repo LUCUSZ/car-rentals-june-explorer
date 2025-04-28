@@ -3,14 +3,6 @@ import { collection, query, where, getDocs, getDoc, doc, setDoc, addDoc } from '
 import { Car, Rental } from '../lib/types';
 import { toast } from 'sonner';
 
-// Check if date is in June 2025
-export const isJune2025 = (date: Date): boolean => {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  
-  return year === 2025 && month === 5; // JavaScript months are 0-indexed
-};
-
 // Get all available cars for a specific date
 export const getAvailableCars = async (selectedDate: Date): Promise<Car[]> => {
   try {
@@ -185,10 +177,10 @@ export const populateMockData = async (): Promise<boolean> => {
       return false;
     }
     
-    // Define mock car data
+    // Define mock car data with images
     const mockCars = [
-      { make: 'Toyota', model: 'Camry', color: 'White', rentals: [] },
-      { make: 'Honda', model: 'Civic', color: 'Black', rentals: [] },
+      { make: 'Toyota', model: 'Camry', color: 'White', rentals: [], image: '/placeholder.svg' },
+      { make: 'Honda', model: 'Civic', color: 'Black', rentals: [], image: '/placeholder.svg' },
       { make: 'Ford', model: 'Mustang', color: 'Red', rentals: [] },
       { make: 'Tesla', model: 'Model 3', color: 'Blue', rentals: [] },
       { make: 'BMW', model: 'X5', color: 'Silver', rentals: [] },
