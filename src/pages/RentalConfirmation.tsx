@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/auth-context";
-import { getCarById, createRental, isJune2025 } from "@/services/carService";
+import { getCarById, createRental } from "@/services/carService";
 import { Car } from "@/lib/types";
 import { toast } from "sonner";
 
@@ -31,8 +31,8 @@ const RentalConfirmation = () => {
         return;
       }
       
-      if (!rentDate || !isJune2025(rentDate)) {
-        toast.error("Please select a valid date in June 2025");
+      if (!rentDate) {
+        toast.error("Please select a valid date");
         navigate("/home");
         return;
       }
