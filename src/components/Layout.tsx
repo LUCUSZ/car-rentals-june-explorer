@@ -2,15 +2,18 @@
 import { useAuth } from "@/contexts/auth-context";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Car, Home, User } from "lucide-react";
+import { Car, Home, User, MessageSquare, Settings } from "lucide-react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { signOut } = useAuth();
+  const { currentUser } = useAuth();
   const location = useLocation();
   
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
+
+  // Check if user is an admin (for demo purposes)
+  const isAdmin = currentUser?.email === "admin@example.com";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -25,18 +28,28 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <Home size={24} />
             <span className="text-xs mt-1">Search</span>
           </Link>
+          
           <Link to="/my-rentals" className={`flex flex-col items-center ${isActive('/my-rentals') ? 'text-car' : 'text-gray-600'}`}>
             <Car size={24} />
             <span className="text-xs mt-1">My Rentals</span>
           </Link>
-          <Button 
-            variant="ghost" 
-            className="flex flex-col items-center h-full rounded-none text-gray-600 hover:text-car hover:bg-transparent"
-            onClick={() => signOut()}
-          >
+          
+          <Link to="/chat" className={`flex flex-col items-center ${isActive('/chat') ? 'text-car' : 'text-gray-600'}`}>
+            <MessageSquare size={24} />
+            <span className="text-xs mt-1">Messages</span>
+          </Link>
+          
+          <Link to="/profile" className={`flex flex-col items-center ${isActive('/profile') ? 'text-car' : 'text-gray-600'}`}>
             <User size={24} />
-            <span className="text-xs mt-1">Logout</span>
-          </Button>
+            <span className="text-xs mt-1">Profile</span>
+          </Link>
+          
+          {isAdmin && (
+            <Link to="/admin" className={`flex flex-col items-center ${isActive('/admin') ? 'text-car' : 'text-gray-600'}`}>
+              <Settings size={24} />
+              <span className="text-xs mt-1">Admin</span>
+            </Link>
+          )}
         </div>
       </div>
     </div>

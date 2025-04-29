@@ -9,8 +9,14 @@ import Welcome from "@/pages/Welcome";
 import SignUp from "@/pages/SignUp";
 import Login from "@/pages/Login";
 import Home from "@/pages/Home";
+import CarDetails from "@/pages/CarDetails";
+import Booking from "@/pages/Booking";
 import RentalConfirmation from "@/pages/RentalConfirmation";
+import Chat from "@/pages/Chat";
 import MyRentals from "@/pages/MyRentals";
+import Profile from "@/pages/Profile";
+import ManageBookings from "@/pages/ManageBookings";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/NotFound";
 import Layout from "@/components/Layout";
 
@@ -51,6 +57,7 @@ const AppRoutes = () => (
     <Route path="/" element={<AuthRoute><Welcome /></AuthRoute>} />
     <Route path="/signup" element={<AuthRoute><SignUp /></AuthRoute>} />
     <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+    
     <Route path="/home" element={
       <ProtectedRoute>
         <Layout>
@@ -58,6 +65,23 @@ const AppRoutes = () => (
         </Layout>
       </ProtectedRoute>
     } />
+    
+    <Route path="/car/:carId" element={
+      <ProtectedRoute>
+        <Layout>
+          <CarDetails />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/booking/:carId" element={
+      <ProtectedRoute>
+        <Layout>
+          <Booking />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
     <Route path="/rental-confirmation/:carId" element={
       <ProtectedRoute>
         <Layout>
@@ -65,6 +89,23 @@ const AppRoutes = () => (
         </Layout>
       </ProtectedRoute>
     } />
+    
+    <Route path="/chat" element={
+      <ProtectedRoute>
+        <Layout>
+          <Chat />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/chat/:chatId" element={
+      <ProtectedRoute>
+        <Layout>
+          <Chat />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
     <Route path="/my-rentals" element={
       <ProtectedRoute>
         <Layout>
@@ -72,6 +113,31 @@ const AppRoutes = () => (
         </Layout>
       </ProtectedRoute>
     } />
+    
+    <Route path="/profile" element={
+      <ProtectedRoute>
+        <Layout>
+          <Profile />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/manage-bookings" element={
+      <ProtectedRoute>
+        <Layout>
+          <ManageBookings />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
+    <Route path="/admin" element={
+      <ProtectedRoute>
+        <Layout>
+          <Admin />
+        </Layout>
+      </ProtectedRoute>
+    } />
+    
     <Route path="*" element={<NotFound />} />
   </Routes>
 );
